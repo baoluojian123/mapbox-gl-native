@@ -446,8 +446,7 @@ void GeometryTileWorker::finalizeLayout() {
                 return;
             }
 
-            layout->prepareSymbols(glyphMap, glyphAtlas.positions,
-                                  imageMap, iconAtlas.iconPositions);
+            layout->prepareSymbols(glyphMap, glyphAtlas.positions, imageMap, iconAtlas.iconPositions);
 
             if (!layout->hasSymbolInstances()) {
                 continue;
