@@ -12,6 +12,49 @@ namespace mbgl {
 TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
     : bounds(LatLngBounds()), constrainMode(constrainMode_), viewportMode(viewportMode_) {}
 
+void TransformState::setProperties(const TransformStateProperties& properties) {
+    if (properties.x) {
+        setX(properties.x.value());
+    }
+    if (properties.y) {
+        setY(properties.y.value());
+    }
+    if (properties.scale) {
+        setScale(properties.scale.value());
+    }
+    if (properties.bearing) {
+        setBearing(properties.bearing.value());
+    }
+    if (properties.pitch) {
+        setPitch(properties.pitch.value());
+    }
+    if (properties.xSkew) {
+        setXSkew(properties.xSkew.value());
+    }
+    if (properties.ySkew) {
+        setYSkew(properties.ySkew.value());
+    }
+    if (properties.axonometric) {
+        setAxonometric(properties.axonometric.value());
+    }
+    if (properties.edgeInsets) {
+        setEdgeInsets(properties.edgeInsets.value());
+    }
+    if (properties.size) {
+        setSize(properties.size.value());
+    }
+    if (properties.constrain) {
+        setConstrainMode(properties.constrain.value());
+    }
+    if (properties.northOrientation) {
+        setNorthOrientation(properties.northOrientation.value());
+    }
+    if (properties.viewPortMode) {
+        setViewportMode(properties.viewPortMode.value());
+    }
+    updateMatrix();
+}
+
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) const {
@@ -129,7 +172,6 @@ void TransformState::setSize(const Size& size_) {
         size = size_;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 #pragma mark - North Orientation
@@ -143,7 +185,6 @@ void TransformState::setNorthOrientation(const NorthOrientation& val) {
         orientation = val;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 double TransformState::getNorthOrientationAngle() const {
@@ -169,7 +210,6 @@ void TransformState::setConstrainMode(const ConstrainMode& val) {
         constrainMode = val;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 #pragma mark - ViewportMode
@@ -183,7 +223,6 @@ void TransformState::setViewportMode(ViewportMode val) {
         viewportMode = val;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 #pragma mark - Camera options
@@ -204,17 +243,12 @@ void TransformState::setEdgeInsets(const EdgeInsets& val) {
         edgeInsets = val;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 #pragma mark - Position
 
 LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
-    return {
-        util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI),
-        -x / Bc,
-        wrapMode
-    };
+    return {util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI), -x / Bc, wrapMode};
 }
 
 double TransformState::pixel_x() const {
@@ -279,18 +313,53 @@ double TransformState::getMaxZoom() const {
     return scaleZoom(max_scale);
 }
 
+#pragma mark - Scale
+double TransformState::getScale() const {
+    return scale;
+}
+
+void TransformState::setScale(double val) {
+    if (scale != val) {
+        scale = val;
+        matrixUpdated = false;
+    }
+}
+
+#pragma mark - Positions
+
+double TransformState::getX() const {
+    return x;
+}
+
+void TransformState::setX(double val) {
+    if (x != val) {
+        x = val;
+        matrixUpdated = false;
+    }
+}
+
+double TransformState::getY() const {
+    return y;
+}
+
+void TransformState::setY(double val) {
+    if (y != val) {
+        y = val;
+        matrixUpdated = false;
+    }
+}
+
 #pragma mark - Rotation
 
-float TransformState::getBearing() const {
+double TransformState::getBearing() const {
     return bearing;
 }
 
-void TransformState::setBearing(float val) {
+void TransformState::setBearing(double val) {
     if (bearing != val) {
         bearing = val;
         matrixUpdated = false;
     }
-    updateMatrix();
 }
 
 float TransformState::getFieldOfView() const {
@@ -301,16 +370,19 @@ float TransformState::getCameraToCenterDistance() const {
     return 0.5 * size.height / std::tan(fov / 2.0);
 }
 
-float TransformState::getPitch() const {
+double TransformState::getPitch() const {
     return pitch;
 }
 
-void TransformState::setPitch(float val) {
+void TransformState::setPitch(double val) {
     if (pitch != val) {
         pitch = val;
         matrixUpdated = false;
     }
-    updateMatrix();
+}
+
+double TransformState::getXSkew() const {
+    return xSkew;
 }
 
 void TransformState::setXSkew(double val) {
@@ -319,12 +391,19 @@ void TransformState::setXSkew(double val) {
         matrixUpdated = false;
     }
 }
+double TransformState::getYSkew() const {
+    return ySkew;
+}
 
 void TransformState::setYSkew(double val) {
     if (ySkew != val) {
         ySkew = val;
         matrixUpdated = false;
     }
+}
+
+bool TransformState::getAxonometric() const {
+    return axonometric;
 }
 
 void TransformState::setAxonometric(bool val) {
@@ -394,7 +473,7 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     vec4 coord0;
     vec4 coord1;
     vec4 point0 = {{ point.x, flippedY, 0, 1 }};
-    vec4 point1 = {{ point.x, flippedY, 1, 1 }};
+    vec4 point1 = {{point.x, flippedY, 1, 1}};
     matrix::transformMat4(coord0, point0, invertedMatrix);
     matrix::transformMat4(coord1, point1, invertedMatrix);
 
@@ -409,7 +488,7 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
 
     Point<double> p = util::interpolate(p0, p1, t) / scale * static_cast<double>(1 << atZoom);
-    return { { p.x, p.y }, static_cast<double>(atZoom) };
+    return {{p.x, p.y}, static_cast<double>(atZoom)};
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
@@ -439,12 +518,6 @@ bool TransformState::rotatedNorth() const {
     return (orientation == NO::Leftwards || orientation == NO::Rightwards);
 }
 
-void TransformState::constrain() {
-    constrain(scale, x, y);
-    matrixUpdated = false;
-    updateMatrix();
-}
-
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     if (constrainMode == ConstrainMode::None) {
         return;
@@ -466,7 +539,7 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 ScreenCoordinate TransformState::getCenterOffset() const {
-    return { 0.5 * (edgeInsets.left() - edgeInsets.right()), 0.5 * (edgeInsets.top() - edgeInsets.bottom()) };
+    return {0.5 * (edgeInsets.left() - edgeInsets.right()), 0.5 * (edgeInsets.top() - edgeInsets.bottom())};
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
