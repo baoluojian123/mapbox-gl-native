@@ -14,43 +14,43 @@ TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewpo
 
 void TransformState::setProperties(const TransformStateProperties& properties) {
     if (properties.x) {
-        setX(properties.x.value());
+        setX(*properties.x);
     }
     if (properties.y) {
-        setY(properties.y.value());
+        setY(*properties.y);
     }
     if (properties.scale) {
-        setScale(properties.scale.value());
+        setScale(*properties.scale);
     }
     if (properties.bearing) {
-        setBearing(properties.bearing.value());
+        setBearing(*properties.bearing);
     }
     if (properties.pitch) {
-        setPitch(properties.pitch.value());
+        setPitch(*properties.pitch);
     }
     if (properties.xSkew) {
-        setXSkew(properties.xSkew.value());
+        setXSkew(*properties.xSkew);
     }
     if (properties.ySkew) {
-        setYSkew(properties.ySkew.value());
+        setYSkew(*properties.ySkew);
     }
     if (properties.axonometric) {
-        setAxonometric(properties.axonometric.value());
+        setAxonometric(*properties.axonometric);
     }
     if (properties.edgeInsets) {
-        setEdgeInsets(properties.edgeInsets.value());
+        setEdgeInsets(*properties.edgeInsets);
     }
     if (properties.size) {
-        setSize(properties.size.value());
+        setSize(*properties.size);
     }
     if (properties.constrain) {
-        setConstrainMode(properties.constrain.value());
+        setConstrainMode(*properties.constrain);
     }
     if (properties.northOrientation) {
-        setNorthOrientation(properties.northOrientation.value());
+        setNorthOrientation(*properties.northOrientation);
     }
     if (properties.viewPortMode) {
-        setViewportMode(properties.viewPortMode.value());
+        setViewportMode(*properties.viewPortMode);
     }
     updateMatrix();
 }
@@ -180,7 +180,7 @@ NorthOrientation TransformState::getNorthOrientation() const {
     return orientation;
 }
 
-void TransformState::setNorthOrientation(const NorthOrientation& val) {
+void TransformState::setNorthOrientation(const NorthOrientation val) {
     if (orientation != val) {
         orientation = val;
         matrixUpdated = false;
@@ -205,7 +205,7 @@ ConstrainMode TransformState::getConstrainMode() const {
     return constrainMode;
 }
 
-void TransformState::setConstrainMode(const ConstrainMode& val) {
+void TransformState::setConstrainMode(const ConstrainMode val) {
     if (constrainMode != val) {
         constrainMode = val;
         matrixUpdated = false;
@@ -566,8 +566,6 @@ void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
         0.5 * Cc * std::log((1 + f) / (1 - f)),
     };
     setScalePoint(newScale, point);
-    matrixUpdated = false;
-    updateMatrix();
 }
 
 void TransformState::setScalePoint(const double newScale, const ScreenCoordinate& point) {
@@ -580,6 +578,8 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     y = constrainedPoint.y;
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
+    matrixUpdated = false;
+    updateMatrix();
 }
 
 float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {

@@ -331,12 +331,12 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
             double maxPitch;
             if (padding != startEdgeInsets) {
                 // Interpolate edge insets
-                EdgeInsets edgeInsects{util::interpolate(startEdgeInsets.top(), padding.top(), k),
-                                       util::interpolate(startEdgeInsets.left(), padding.left(), k),
-                                       util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
-                                       util::interpolate(startEdgeInsets.right(), padding.right(), k)};
-                properties.withEdgeInsets(edgeInsects);
-                maxPitch = getMaxPitchForEdgeInsets(edgeInsects);
+                EdgeInsets edgeInsets{util::interpolate(startEdgeInsets.top(), padding.top(), k),
+                                      util::interpolate(startEdgeInsets.left(), padding.left(), k),
+                                      util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
+                                      util::interpolate(startEdgeInsets.right(), padding.right(), k)};
+                properties.withEdgeInsets(edgeInsets);
+                maxPitch = getMaxPitchForEdgeInsets(edgeInsets);
             } else {
                 maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
             }
@@ -420,13 +420,12 @@ double Transform::getPitch() const {
 #pragma mark - North Orientation
 
 void Transform::setNorthOrientation(NorthOrientation orientation) {
-    TransformStateProperties properties;
-    properties.withNorthOrientation(orientation);
+    state.setNorthOrientation(orientation);
     double scale{state.getScale()};
     double x{state.getX()};
     double y{state.getY()};
     state.constrain(scale, x, y);
-    state.setProperties(properties.withScale(scale).withX(x).withY(y));
+    state.setProperties(TransformStateProperties().withScale(scale).withX(x).withY(y));
 }
 
 NorthOrientation Transform::getNorthOrientation() const {

@@ -106,11 +106,11 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
-    void setNorthOrientation(const NorthOrientation&);
+    void setNorthOrientation(const NorthOrientation);
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
-    void setConstrainMode(const ConstrainMode&);
+    void setConstrainMode(const ConstrainMode);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
@@ -134,13 +134,13 @@ public:
 
     // Scale
     double getScale() const;
-    void setScale(double val);
+    void setScale(double);
 
     // Positions
     double getX() const;
-    void setX(double val);
+    void setX(double);
     double getY() const;
-    void setY(double val);
+    void setY(double);
 
     // Bounds
     void setLatLngBounds(LatLngBounds);
@@ -159,11 +159,11 @@ public:
     void setPitch(double);
 
     double getXSkew() const;
-    void setXSkew(double val);
+    void setXSkew(double);
     double getYSkew() const;
-    void setYSkew(double val);
+    void setYSkew(double);
     bool getAxonometric() const;
-    void setAxonometric(bool val);
+    void setAxonometric(bool);
 
     // State
     bool isChanging() const;
