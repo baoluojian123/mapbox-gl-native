@@ -362,7 +362,7 @@ add_custom_command(
         ${CMAKE_COMMAND}
         -E
         tar
-        "cf"
+        "chf"
         "render-test/android/app/src/main/assets/data.zip"
         --format=zip
         --files-from=render-test/android/app/src/main/assets/to_zip.txt

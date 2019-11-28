@@ -79,7 +79,7 @@ std::string jstringToStdString(JNIEnv* env, jstring jStr) {
     return ret;
 }
 
-void changeState(JNIEnv* env, struct android_app* app) {
+void changeState(JNIEnv* env, struct android_app* app, bool result) {
     jobject nativeActivity = app->activity->clazz;
     jclass acl = env->GetObjectClass(nativeActivity);
     jmethodID getClassLoader = env->GetMethodID(acl, "getClassLoader", "()Ljava/lang/ClassLoader;");
@@ -89,6 +89,8 @@ void changeState(JNIEnv* env, struct android_app* app) {
     JavaWrapper<jstring> strClassName(env, env->NewStringUTF("android.app.TestState"));
     jclass testStateClass = static_cast<jclass>(env->CallObjectMethod(cls, findClass, strClassName.get()));
     if (testStateClass != NULL) {
+        jfieldID id0 = env->GetStaticFieldID(testStateClass, "testResult", "Z");
+        env->SetStaticBooleanField(testStateClass, id0, result);
         jfieldID id = env->GetStaticFieldID(testStateClass, "running", "Z");
         env->SetStaticBooleanField(testStateClass, id, false);
     }
@@ -271,9 +273,9 @@ void android_main(struct android_app* app) {
             mbgl::Log::Info(mbgl::Event::General, "Current finished tests number is '%d' ", ++finishedTestCount);
         };
 
-        mbgl::runRenderTests(argv.size() - 1, argv.data(), testStatus);
+        auto result = mbgl::runRenderTests(argv.size() - 1, argv.data(), testStatus) == 0;
         mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
-        changeState(env, app);
+        changeState(env, app, result);
     }
     while (true) {
         ALooper_pollAll(0, &outFd, &outEvents, reinterpret_cast<void**>(&source));
